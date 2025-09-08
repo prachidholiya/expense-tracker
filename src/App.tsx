@@ -4,6 +4,7 @@ import Home from "./pages/Home/Index";
 import Income from "./pages/Income/Index";
 import Expense from "./pages/Expense/Index";
 import Settings from "./pages/Settings/Index";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </BrowserRouter>
+      <Toaster position="top-center" />
     </div>
   );
 };
