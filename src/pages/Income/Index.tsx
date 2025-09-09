@@ -12,6 +12,8 @@ const validationSchema = Yup.object({
 });
 
 const Income = () => {
+  const categories = JSON.parse(localStorage.getItem("items") || "[]");
+
   const { handleBlur, handleChange, handleSubmit, values, errors, touched } =
     useFormik({
       initialValues: {
@@ -42,14 +44,16 @@ const Income = () => {
             onBlur={handleBlur}
             className="p-2 bg-gray-900 rounded-lg  text-white"
           >
-            <option value="">Select Income Type</option>
-            <option value="salary">Salary</option>
-            <option value="business">Business</option>
-            <option value="investment">Investment</option>
-            <option value="other">Other</option>
+            {categories.map((item: string, idx: number) => (
+              <option key={idx} value={item}>
+                {item}
+              </option>
+            ))}
           </select>
           {touched.type && errors.type && (
-            <span className="text-red-700 text-sm -mt-2 mx-2">{errors.type}</span>
+            <span className="text-red-700 text-sm -mt-2 mx-2">
+              {errors.type}
+            </span>
           )}
 
           <input
@@ -62,7 +66,9 @@ const Income = () => {
             className="p-2 bg-gray-900 rounded-lg  text-white"
           />
           {touched.amount && errors.amount && (
-             <span className="text-red-700 text-sm -mt-2 mx-2">{errors.amount}</span>
+            <span className="text-red-700 text-sm -mt-2 mx-2">
+              {errors.amount}
+            </span>
           )}
 
           <input
@@ -74,7 +80,9 @@ const Income = () => {
             className="p-2 bg-gray-900 rounded-lg  text-white"
           />
           {touched.date && errors.date && (
-             <span className="text-red-700 text-sm -mt-2 mx-2">{errors.date}</span>
+            <span className="text-red-700 text-sm -mt-2 mx-2">
+              {errors.date}
+            </span>
           )}
 
           <textarea
@@ -87,15 +95,12 @@ const Income = () => {
             rows={2}
           />
           {touched.description && errors.description && (
-             <span className="text-red-700 text-sm -mt-2 mx-2">
+            <span className="text-red-700 text-sm -mt-2 mx-2">
               {errors.description}
             </span>
           )}
 
-          <button
-            type="submit"
-            className="bg-black rounded-lg p-2  text-white"
-          >
+          <button type="submit" className="bg-black rounded-lg p-2  text-white">
             Add Income
           </button>
         </form>

@@ -44,8 +44,16 @@ const Categories = () => {
     },
     validationSchema,
     onSubmit: (submittedValues) => {
-      setItems([...items, submittedValues.category]);
-      toast.success("Category added successfully");
+      if (editIndex !== null) {
+        const updatedItems = [...items];
+        updatedItems[editIndex] = submittedValues.category;
+        setItems(updatedItems);
+        toast.success("Category updated successfully");
+        setEditIndex(null);
+      } else {
+        setItems([...items, submittedValues.category]);
+        toast.success("Category added successfully");
+      }
       resetForm();
     },
   });
@@ -53,6 +61,12 @@ const Categories = () => {
   const handleEdit = (idx: number) => {
     setEditIndex(idx);
     setFieldValue("category", items[idx]);
+  };
+
+  const handleDelete = (idx: number) => {
+    const res = items.filter((_, index) => index !== idx);
+    setItems(res);
+    toast.success("Category deleted successfully");
   };
 
   return (
@@ -83,7 +97,7 @@ const Categories = () => {
           type="submit"
           className="bg-black text-white cursor-pointer rounded-md py-2 px-4 h-10 mt-6"
         >
-          Add
+          {editIndex !== null ? "Update" : "Add"}
         </button>
       </form>
       <div className=" rounded-xl shadow-lg border border-gray-800 p-6 mt-6 mx-auto max-w-2xl">
@@ -106,7 +120,7 @@ const Categories = () => {
                   </button>
                   <button
                     type="button"
-                    // onClick={() => handleDelete(idx)}
+                    onClick={() => handleDelete(idx)}
                     className="hover:text-red-600 cursor-pointer"
                     title="Delete"
                   >
