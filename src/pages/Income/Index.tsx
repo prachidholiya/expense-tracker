@@ -1,5 +1,7 @@
 import { useFormik } from "formik";
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
+import type { INCOMEI } from "../../constants/types";
 
 const validationSchema = Yup.object({
   type: Yup.string().required("Income type is required"),
@@ -12,25 +14,46 @@ const validationSchema = Yup.object({
 });
 
 const Income = () => {
+  const [income, setIncome] = useState<INCOMEI[]>([]);
+
+  useEffect(() => {
+    const storedIncome = localStorage.getItem("users");
+    if (storedIncome) {
+      setIncome(JSON.parse(storedIncome));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("income", JSON.stringify(income));
+  }, [income]);
+
   const categories = JSON.parse(localStorage.getItem("items") || "[]");
 
-  const { handleBlur, handleChange, handleSubmit, values, errors, touched } =
-    useFormik({
-      initialValues: {
-        type: "",
-        amount: "",
-        date: "",
-        description: "",
-      },
-      validationSchema,
-      onSubmit: (submitedValues) => {
-        console.log(submitedValues);
-      },
-    });
+  const {
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    values,
+    errors,
+    touched,
+    resetForm,
+  } = useFormik<INCOMEI>({
+    initialValues: {
+      type: "",
+      amount: 0,
+      date: "",
+      description: "",
+    },
+    validationSchema,
+    onSubmit: (submittedValues) => {
+      setIncome((prev) => [...prev, submittedValues]);
+      resetForm();
+    },
+  });
 
   return (
     <div className="flex justify-center py-10 min-h-screen">
-      <div className="bg-gray-600 w-1/3 mx-auto flex justify-center rounded-lg h-[500px]">
+      <div className="bg-gray-600 w-2/3 md:w-1/3 mx-auto flex justify-center rounded-lg h-[500px]">
         <form
           className="flex flex-col gap-3 p-4 w-full"
           onSubmit={handleSubmit}
@@ -100,7 +123,10 @@ const Income = () => {
             </span>
           )}
 
-          <button type="submit" className="bg-black rounded-lg p-2  text-white">
+          <button
+            type="submit"
+            className="bg-black cursor-pointer rounded-lg p-2  text-white"
+          >
             Add Income
           </button>
         </form>
