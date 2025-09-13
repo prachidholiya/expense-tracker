@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
-import type { INCOMEI } from "../../constants/types";
+import type { TRANSACTIONI } from "../../constants/types";
 
 const validationSchema = Yup.object({
   type: Yup.string().required("Income type is required"),
@@ -14,18 +14,21 @@ const validationSchema = Yup.object({
 });
 
 const Income = () => {
-  const [income, setIncome] = useState<INCOMEI[]>([]);
+  const [transactions, setTransactions] = useState<TRANSACTIONI[]>(() => {
+    const stored = localStorage.getItem("transactions");
+    return stored ? JSON.parse(stored) : [];
+  });
 
   useEffect(() => {
-    const storedIncome = localStorage.getItem("users");
-    if (storedIncome) {
-      setIncome(JSON.parse(storedIncome));
+    const stored = localStorage.getItem("transactions");
+    if (stored) {
+      setTransactions(JSON.parse(stored));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("income", JSON.stringify(income));
-  }, [income]);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+  }, [transactions]);
 
   const categories = JSON.parse(localStorage.getItem("items") || "[]");
 
@@ -37,7 +40,7 @@ const Income = () => {
     errors,
     touched,
     resetForm,
-  } = useFormik<INCOMEI>({
+  } = useFormik<TRANSACTIONI>({
     initialValues: {
       type: "",
       amount: 0,
@@ -46,7 +49,11 @@ const Income = () => {
     },
     validationSchema,
     onSubmit: (submittedValues) => {
-      setIncome((prev) => [...prev, submittedValues]);
+      const newIncome: TRANSACTIONI = {
+        ...submittedValues,
+        transactionType: "income",
+      };
+      setTransactions((prev) => [...prev, newIncome]);
       resetForm();
     },
   });

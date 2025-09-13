@@ -1,8 +1,22 @@
 import { useState } from "react";
 import { tabsData } from "../../constants/constants";
+import Categories from "../../components/Categories/Index";
+import Payments from "../../components/Payments/Index";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState<number>(0);
+
+  const renderTabContent = () => {
+    const activeValue = tabsData[activeTab]?.value;
+
+    if (activeValue === "categories") {
+      return <Categories />;
+    } else if (activeValue === "payments") {
+      return <Payments />;
+    } else {
+      return null;
+    }
+  };
 
   return (
     <div className="w-full p-5">
@@ -22,7 +36,7 @@ const Settings = () => {
           </div>
         ))}
       </div>
-      <div className="">{tabsData[activeTab].component}</div>
+      <div>{renderTabContent()}</div>
     </div>
   );
 };

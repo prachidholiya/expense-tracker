@@ -1,5 +1,7 @@
 import { useFormik } from "formik";
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
+import type { TRANSACTIONI } from "../../constants/types";
 
 const validationSchema = Yup.object({
   type: Yup.string().required("Expense type is required"),
@@ -12,20 +14,47 @@ const validationSchema = Yup.object({
 });
 
 const Expense = () => {
-  const { handleBlur, handleChange, handleSubmit, values, errors, touched } =
-    useFormik({
-      initialValues: {
-        type: "",
-        amount: "",
-        date: "",
-        description: "",
-      },
-      validationSchema,
-      onSubmit: (submittedValues, actions) => {
-        console.log(submittedValues);
-        actions.resetForm();
-      },
-    });
+  const [transactions, setTransactions] = useState<TRANSACTIONI[]>(() => {
+    const stored = localStorage.getItem("transactions");
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  useEffect(() => {
+    const stored = localStorage.getItem("transactions");
+    if (stored) {
+      setTransactions(JSON.parse(stored));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+  }, [transactions]);
+
+  const {
+    handleBlur,
+    handleChange,
+    resetForm,
+    handleSubmit,
+    values,
+    errors,
+    touched,
+  } = useFormik<TRANSACTIONI>({
+    initialValues: {
+      type: "",
+      amount: 0,
+      date: "",
+      description: "",
+    },
+    validationSchema,
+    onSubmit: (submittedValues) => {
+      const newExpense: TRANSACTIONI = {
+        ...submittedValues,
+        transactionType: "expense",
+      };
+      setTransactions((prev) => [...prev, newExpense]);
+      resetForm();
+    },
+  });
 
   return (
     <div className="flex justify-center py-10 min-h-screen">
