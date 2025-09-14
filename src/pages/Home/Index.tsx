@@ -1,9 +1,12 @@
+import { useState } from "react";
 import type { TRANSACTIONI } from "../../constants/types";
+import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
 
 const Home = () => {
   const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+  const [currPage, setCurrPage] = useState(0);
 
-  console.log("sadsdfdf", transactions);
+  console.log("sadsdfdf", transactions.length);
 
   // const total = transactions.reduce(
   //   (acc: number, curr: TRANSACTIONI) => acc + Number(curr.amount),
@@ -19,6 +22,27 @@ const Home = () => {
     .reduce((acc: number, curr: TRANSACTIONI) => acc + Number(curr.amount), 0);
 
   const balance = totalIncome - totalExpense;
+
+  const pageSize = 10;
+  const totalEntries = transactions.length;
+  const noOfPages = Math.ceil(totalEntries / pageSize);
+
+  console.log(totalEntries);
+
+  const start = currPage * pageSize;
+  const end = start + pageSize;
+
+  const handlePageChange = (n: number) => {
+    setCurrPage(n);
+  };
+
+  const handleLeftChange = () => {
+    setCurrPage(currPage - 1);
+    console.log(setCurrPage(currPage - 1));
+  };
+  const handleRightChange = () => {
+    setCurrPage(currPage + 1);
+  };
 
   return (
     <>
@@ -43,64 +67,79 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="px-10">
-        <p className="text-xl font-semibold mb-4">Recent Entries</p>
-
-        <div className=" space-y-4">
+      <div className="flex justify-center">
+        <button className="cursor-pointer" onClick={handleLeftChange}>
+          <BiLeftArrow />
+        </button>
+        {[...Array(noOfPages).keys()].map((n) => (
+          <button
+            className={`px-3 m-1 border cursor-pointer ${
+              currPage === n ? "bg-gray-700" : ""
+            }`}
+            onClick={() => handlePageChange(n)}
+            key={n}
+          >
+            {n}
+          </button>
+        ))}
+        <button className="cursor-pointer" onClick={handleRightChange}>
+          <BiRightArrow />{" "}
+        </button>
+      </div>
+      <div className="px-4 py-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {transactions.length === 0 ? (
-            <p className="text-gray-500">No entries yet.</p>
+            <p className="text-gray-500 text-center col-span-2">
+              No entries yet.
+            </p>
           ) : (
-            transactions.map((i: TRANSACTIONI, index: number) => (
-              <div
-                key={index}
-                className="bg-gray-800 rounded-lg w-2/4 mx-auto shadow p-4 hover:bg-gray-700 transition"
-              >
-                <div className="flex justify-between text-sm text-white">
-                  <p>
-                    <span className="text-gray-400 text-xs uppercase mr-1">
-                      Amount:
-                    </span>
-                    <span className="font-bold text-green-400">
+            transactions
+              .slice(start, end)
+              .map((i: TRANSACTIONI, index: number) => (
+                <div
+                  key={index}
+                  className="bg-gray-900 border border-white rounded-2xl shadow-lg p-3 hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="flex justify-between items-center border-b border-gray-700 pb-2 mb-3">
+                    <h3 className="text-lg font-semibold text-white">
                       ₹{i.amount}
-                    </span>
-                  </p>
-
-                  <p>
-                    <span className="text-gray-400 text-xs uppercase mr-1">
-                      Date:
-                    </span>
-                    {i.date}
-                  </p>
-
-                  <p>
-                    <span className="text-gray-400 text-xs uppercase mr-1">
-                      Type:
-                    </span>
-                    {i.type}
-                  </p>
-                </div>
-
-                <div className="mt-2 text-sm flex justify-between items-center">
-                  <div className="">
-                    <span className="text-gray-400 text-xs uppercase mr-1">
-                      Description:
-                    </span>
-                    <span className="text-gray-300">{i.description}</span>
-                  </div>
-                  <div className="flex justify-end">
+                    </h3>
                     <span
-                      className={`${
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
                         i.transactionType === "income"
-                          ? "bg-green-700 px-2 py-1 rounded-full text-xs"
-                          : "bg-red-700 px-2 py-1 rounded-full text-xs"
+                          ? "bg-green-600/20 text-green-400 border border-green-600"
+                          : "bg-red-600/20 text-red-400 border border-red-600"
                       }`}
                     >
                       {i.transactionType}
                     </span>
                   </div>
+
+                  <div className="space-y-2 text-sm text-gray-300">
+                    <div className="flex justify-between">
+                      <div className="flex ">
+                        <span className="text-gray-400">Date : </span>
+                        <span> {i.date}</span>
+                      </div>
+                      <div className="flex">
+                        <span className="text-gray-400">Type : </span>
+                        <span className="capitalize"> {i.type}</span>
+                      </div>
+                    </div>
+                    {i.description && (
+                      <div className="flex">
+                        <span className=" text-gray-400 mb-1">
+                          Description :
+                        </span>
+                        <p className="text-gray-200 text-sm">
+                          {" "}
+                          {i.description}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))
+              ))
           )}
         </div>
       </div>

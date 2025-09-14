@@ -2,6 +2,8 @@ import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
 import type { TRANSACTIONI } from "../../constants/types";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const validationSchema = Yup.object({
   type: Yup.string().required("Income type is required"),
@@ -18,6 +20,8 @@ const Income = () => {
     const stored = localStorage.getItem("transactions");
     return stored ? JSON.parse(stored) : [];
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const stored = localStorage.getItem("transactions");
@@ -55,6 +59,8 @@ const Income = () => {
       };
       setTransactions((prev) => [...prev, newIncome]);
       resetForm();
+      toast.success("Income created successfully");
+      navigate("/");
     },
   });
 
